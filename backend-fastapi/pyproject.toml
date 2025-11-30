@@ -1,0 +1,10 @@
+[project]
+name = "devpulse-backend"
+version = "0.1.0"
+description = "ABackend API for DevPulse - AI Powered Task & Report Management System"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.122.0",
+    "uvicorn>=0.38.0",
+]
