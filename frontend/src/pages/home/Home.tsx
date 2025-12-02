@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../../App.css";
 import { Navigate } from "react-router-dom";
 import { features, benefits, integrations } from "../../constants/data";
@@ -6,6 +6,19 @@ import { useAuth,SignInButton, SignUpButton } from '@clerk/clerk-react';
 
 const Home: React.FC = () => {
   const { isSignedIn } = useAuth();
+
+  const {getToken} = useAuth();
+  
+  useEffect(() => {
+    const fetchToken = async () => {
+    const token = await getToken({ template: "devpulse" });
+      console.log("User token:", token);
+    };
+
+    if (isSignedIn) {
+      fetchToken();
+    }
+  }, [isSignedIn, getToken]);
 
   if (isSignedIn) {
     return <Navigate to="/dashboard" />;
@@ -19,7 +32,6 @@ const Home: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-2xl font-bold text-blue-400">
-              <span className="text-3xl">⚡</span>
               <a href="/">DevPulse</a>
             </div>
             <div className="flex gap-3">
