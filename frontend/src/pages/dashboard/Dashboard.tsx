@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './dashboard.css';
-import { Menu, X, User, Clock, Settings, ChevronRight, LayoutDashboard, Calendar, FileText, CircleCheck , CircleDot, Circle, LogOut } from 'lucide-react';
-import { SignOutButton } from '@clerk/clerk-react';
+import { ChevronRight, CircleCheck , CircleDot, Circle, Clock,X } from 'lucide-react';
+import Header from '../../components/Header';
+import Sidebar from '../../components/Sidebar';
 
 const Dashboard:React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -88,80 +89,10 @@ const Dashboard:React.FC = () => {
   return (
     <div className="min-h-screen h-screen bg-gray-50 transition-colors duration-200 overflow-hidden">
       {/* Header */}
-      <header className="bg-white border-gray-200 border-b px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            <Menu size={24} />
-          </button>
-          <h1 className="text-2xl font-semibold text-blue-500">DevPulse</h1>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl flex items-center gap-2 transition-colors">
-            <LayoutDashboard size={18} />
-            Dashboard
-          </button>
-          <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 transition-colors">
-            <Calendar size={18} />
-            Calendar
-          </button>
-          <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 transition-colors">
-            <FileText size={18} />
-            Generate AI Report
-          </button>
-        </div>
-      </header>
+      <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-screen w-64 bg-white border-gray-200 border-r transform transition-transform duration-300 z-50 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 flex justify-between items-center border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Menu</h2>
-          <button onClick={() => setIsSidebarOpen(false)} className="text-gray-600 hover:text-gray-900">
-            <X size={24} />
-          </button>
-        </div>
-        
-        <nav className="p-4 flex flex-col h-full pb-24">
-          <div className="flex-1 space-y-2 min-h-0">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 hover:text-gray-900 transition-colors">
-              <User size={20} />
-              <span>Profile</span>
-            </button>
-            
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 hover:text-gray-900 transition-colors">
-              <Clock size={20} />
-              <span>History</span>
-            </button>
-            
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 hover:text-gray-900 transition-colors">
-              <Settings size={20} />
-              <span>Settings</span>
-            </button>
-          </div>
-          
-          {/* Sign Out Section */}
-          <div className="absolute bottom-4 left-4 right-4 border-t border-gray-200 pt-4">
-            <SignOutButton>
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 hover:text-red-700 transition-colors border border-red-200 hover:border-red-300">
-                <LogOut size={20} />
-                <span className="font-medium">Sign Out</span>
-              </button>
-            </SignOutButton>
-          </div>
-
-        </nav>
-      </div>
-
-      {/* Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-opacity-10"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content */}
       <main className="p-8 max-w-7xl mx-auto h-screen overflow-y-auto">
