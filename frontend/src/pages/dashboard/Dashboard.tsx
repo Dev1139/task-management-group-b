@@ -87,7 +87,7 @@ const Dashboard:React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen h-screen bg-gray-50 transition-colors duration-200 overflow-hidden">
+    <div className="min-h-screen bg-gray-50 transition-colors duration-200 flex flex-col">
       {/* Header */}
       <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
@@ -95,14 +95,14 @@ const Dashboard:React.FC = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content */}
-      <main className="p-8 max-w-7xl mx-auto h-screen overflow-y-auto">
+      <main className="p-4 mx-auto flex-1 overflow-y-auto pb-16 w-full">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2 text-gray-900">Weekly Sprint Board</h2>
           <p className="text-gray-500">Click on any day to view detailed tasks and schedule</p>
         </div>
 
         {/* Weekly Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-8 max-w-7xl mx-auto">
           {weekData.map((day, index) => (
             <div 
               key={index}

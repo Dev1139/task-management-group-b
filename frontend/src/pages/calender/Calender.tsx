@@ -51,29 +51,13 @@ const Calendar: React.FC<CalendarViewProps> = ({ onDayClick }) => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
 
-  const getProductivityColor = (date: string) => {
+  const getTaskStatusCounts = (date: string) => {
     const dayTasks = tasks.filter(t => t.date === date);
-    if (dayTasks.length === 0) return 'bg-gray-50';
+    const doneCount = dayTasks.filter(t => t.status === 'done').length;
+    const inProgressCount = dayTasks.filter(t => t.status === 'in-progress').length;
+    const notStartedCount = dayTasks.filter(t => t.status === 'not-started').length;
 
-    const completed = dayTasks.filter(t => t.status === 'done').length;
-    const total = dayTasks.length;
-    const rate = total > 0 ? (completed / total) * 100 : 0;
-
-    if (rate >= 80) return 'bg-emerald-600';
-    if (rate >= 60) return 'bg-teal-500';
-    if (rate >= 40) return 'bg-cyan-400';
-    if (rate >= 20) return 'bg-blue-400';
-    if (rate > 0) return 'bg-indigo-300';
-    return 'bg-gray-300';
-  };
-
-  const getTaskStats = (date: string) => {
-    const dayTasks = tasks.filter(t => t.date === date);
-    const completed = dayTasks.filter(t => t.status === 'done').length;
-    const total = dayTasks.length;
-    const highPriority = dayTasks.filter(t => t.priority).length;
-    
-    return { completed, total, highPriority };
+    return { doneCount, inProgressCount, notStartedCount };
   };
 
   const formatDate = (day: number) => {
@@ -105,8 +89,7 @@ const Calendar: React.FC<CalendarViewProps> = ({ onDayClick }) => {
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dateStr = formatDate(day);
-    const stats = getTaskStats(dateStr);
-    const productivityColor = getProductivityColor(dateStr);
+    const { doneCount, inProgressCount, notStartedCount } = getTaskStatusCounts(dateStr);
     const today = isToday(day);
     const isWeekday = date.getDay() !== 0 && date.getDay() !== 6;
 
@@ -120,33 +103,31 @@ const Calendar: React.FC<CalendarViewProps> = ({ onDayClick }) => {
           isWeekday ? 'cursor-pointer hover:scale-105' : 'opacity-50 cursor-not-allowed bg-gray-100'
         }`}
       >
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col relative">
           <div className="flex items-center justify-between mb-2">
-            <span className={`text-sm ${today ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
+            <span className={`text-sm font-bold drop-shadow-md ${today ? 'text-blue-600' : 'text-gray-700'}`}>
               {day}
             </span>
-            {stats.total > 0 && (
-              <div className={`w-6 h-6 rounded-full ${productivityColor} flex items-center justify-center`}>
-                <span className="text-xs text-white">{stats.total}</span>
-              </div>
-            )}
           </div>
 
-          {stats.total > 0 && (
-            <div className="flex-1 flex flex-col justify-end text-xs space-y-1">
-              <div className="text-green-600">✓ {stats.completed}</div>
-              {stats.highPriority > 0 && (
-                <div className="text-yellow-600">⭐ {stats.highPriority}</div>
-              )}
+          <div className="absolute top-2 right-2 flex flex-col items-center gap-1">
+            <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center">
+              <span className="text-xs text-white">{doneCount}</span>
             </div>
-          )}
+            <div className="w-5 h-5 rounded-full bg-yellow-400 flex items-center justify-center">
+              <span className="text-xs text-white">{inProgressCount}</span>
+            </div>
+            <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center">
+              <span className="text-xs text-gray-700">{notStartedCount}</span>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen h-screen bg-gray-50 transition-colors duration-200 overflow-hidden">
+    <div className="min-h-screen bg-gray-50 transition-colors duration-200 flex flex-col">
       {/* Header */}
       <Header onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
@@ -154,14 +135,14 @@ const Calendar: React.FC<CalendarViewProps> = ({ onDayClick }) => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content */}
-      <main className="p-8 max-w-7xl mx-auto h-screen overflow-y-auto">
+      <main className="p-4 mx-auto flex-1 overflow-y-auto pb-16 w-full">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2 text-gray-900">Productivity Calendar</h2>
           <p className="text-gray-500">Track your productivity patterns and task completion over time</p>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div className="space-y-6 h-full">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 h-5/6">
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-6">
           <button
@@ -182,82 +163,41 @@ const Calendar: React.FC<CalendarViewProps> = ({ onDayClick }) => {
         </div>
 
         {/* Day Labels */}
-        <div className="grid grid-cols-7 gap-2 mb-1">
+        <div className="grid grid-cols-7 gap-4 mb-4">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-            <div key={day} className="text-center text-gray-600 text-sm py-2">
+            <div key={day} className="text-center text-gray-600 text-lg font-medium py-3">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-4 flex-1">
           {calendarDays}
         </div>
       </div>
 
       {/* Legend */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4">
-        <h2 className="text-gray-900 mb-3 text-lg">🎨 Productivity Color Scale</h2>
-        
-        <div className="space-y-2">
+        <h2 className="text-gray-900 mb-3 text-lg">Status</h2>
+
+        <div className="grid grid-cols-3 gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gray-50 border border-gray-200" />
-            <div>
-              <p className="text-sm text-gray-700">No tasks</p>
-              <p className="text-xs text-gray-500">No activity for this day</p>
-            </div>
+            <div className="w-6 h-6 rounded-full bg-emerald-600" />
+            <span className="text-sm text-gray-700">Done</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gray-300 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Low (0%)</p>
-              <p className="text-xs text-gray-500">No tasks completed</p>
-            </div>
+            <div className="w-6 h-6 rounded-full bg-yellow-400" />
+            <span className="text-sm text-gray-700">In Progress</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-indigo-300 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Getting Started (1-20%)</p>
-              <p className="text-xs text-gray-500">Few tasks completed</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-blue-400 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Fair (20-40%)</p>
-              <p className="text-xs text-gray-500">Some progress made</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-cyan-400 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Good (40-60%)</p>
-              <p className="text-xs text-gray-500">Moderate productivity</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-teal-500 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Great (60-80%)</p>
-              <p className="text-xs text-gray-500">Strong performance</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-emerald-600 shadow-sm" />
-            <div>
-              <p className="text-sm text-gray-700">Excellent (80-100%)</p>
-              <p className="text-xs text-gray-500">Outstanding achievement</p>
-            </div>
+            <div className="w-6 h-6 rounded-full bg-gray-300" />
+            <span className="text-sm text-gray-700">Not Started</span>
           </div>
         </div>
-          </div>
+      </div>
         </div>
         </main>
     </div>
